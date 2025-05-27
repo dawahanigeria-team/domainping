@@ -78,10 +78,13 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint for Fly.io"""
+    from datetime import datetime
     return {
         "status": "healthy",
-        "service": "DomainPing API"
+        "service": "DomainPing API",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "1.0.0"
     }
 
 if __name__ == "__main__":
