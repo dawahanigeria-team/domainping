@@ -49,14 +49,31 @@ app = FastAPI(
 )
 
 # Configure CORS
+# Build allowed origins list
+allowed_origins = [
+    "http://localhost:3000",  # React development server
+    "http://127.0.0.1:3000",
+    "https://domainping-frontend.fly.dev",  # Fly.io frontend
+    "https://dlzn4ikotqjx.cloudfront.net",  # CloudFront distribution
+]
+
+# Add environment-specific URLs
+frontend_url = os.getenv("FRONTEND_URL")
+if frontend_url and frontend_url not in allowed_origins:
+    allowed_origins.append(frontend_url)
+
+cloudfront_url = os.getenv("CLOUDFRONT_URL")
+if cloudfront_url and cloudfront_url not in allowed_origins:
+    allowed_origins.append(cloudfront_url)
+
+# Filter out empty strings
+allowed_origins = [url for url in allowed_origins if url]
+
+logger.info(f"CORS allowed origins: {allowed_origins}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # React development server
-        "http://127.0.0.1:3000",
-        "https://domainping-frontend.fly.dev",  # Fly.io frontend
-        os.getenv("FRONTEND_URL", "http://localhost:3000")
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
