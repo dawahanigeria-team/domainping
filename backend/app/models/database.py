@@ -10,11 +10,21 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./domains.db")
 
 # SQLAlchemy setup
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False} if "sqlite" in DATABASE_URL else {})
+# Only use check_same_thread for local SQLite, not SQLite Cloud
+connect_args = {}
+if DATABASE_URL.startswith("sqlite:///"):
+    connect_args = {"check_same_thread": False}
+
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Databases setup for async operations
-database = Database(DATABASE_URL)
+# For SQLite Cloud, we need to use a different approach since databases package doesn't support it
+if DATABASE_URL.startswith("sqlitecloud://"):
+    # For SQLite Cloud, we'll use synchronous operations only
+    database = None
+else:
+    database = Database(DATABASE_URL)
 
 # Base class for models
 Base = declarative_base()
@@ -30,11 +40,13 @@ def get_db():
 
 async def connect_db():
     """Connect to database"""
-    await database.connect()
+    if database:
+        await database.connect()
 
 async def disconnect_db():
     """Disconnect from database"""
-    await database.disconnect()
+    if database:
+        await database.disconnect()
 
 def create_tables():
     """Create all tables"""
