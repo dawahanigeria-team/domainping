@@ -54,6 +54,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # React development server
         "http://127.0.0.1:3000",
+        "https://domainping-frontend.fly.dev",  # Fly.io frontend
         os.getenv("FRONTEND_URL", "http://localhost:3000")
     ],
     allow_credentials=True,
@@ -78,10 +79,13 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
+    """Health check endpoint for Fly.io"""
+    from datetime import datetime
     return {
         "status": "healthy",
-        "service": "DomainPing API"
+        "service": "DomainPing API",
+        "timestamp": datetime.utcnow().isoformat(),
+        "version": "1.0.0"
     }
 
 if __name__ == "__main__":
