@@ -34,6 +34,12 @@ variable "domain_name" {
   }
 }
 
+variable "additional_aliases" {
+  description = "Additional domain aliases for CloudFront (e.g., subdomains you manage externally)"
+  type        = list(string)
+  default     = []
+}
+
 variable "cloudfront_price_class" {
   description = "CloudFront price class"
   type        = string

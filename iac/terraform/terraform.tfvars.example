@@ -13,11 +13,18 @@ aws_region = "us-east-1"
 domain_name = ""
 # domain_name = "domainping.com"
 
+# Additional aliases (subdomains you manage externally)
+# Add your subdomain here that you've CNAMEd to CloudFront
+additional_aliases = [
+  # "app.yourdomain.com",
+  # "frontend.yourdomain.com"
+]
+
 # CloudFront configuration
 # PriceClass_100: US, Canada, Europe
 # PriceClass_200: US, Canada, Europe, Asia, Middle East, Africa
 # PriceClass_All: All edge locations
-cloudfront_price_class = "PriceClass_100"
+cloudfront_price_class = "PriceClass_All"
 
 # Logging configuration
 enable_logging = false
