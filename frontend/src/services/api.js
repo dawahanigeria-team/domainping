@@ -1,6 +1,20 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+// Force HTTPS for production, allow HTTP for localhost
+let API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+
+// Force HTTPS if the URL contains domainping.fly.dev but uses HTTP
+if (API_BASE_URL.includes('domainping.fly.dev') && API_BASE_URL.startsWith('http://')) {
+  API_BASE_URL = API_BASE_URL.replace('http://', 'https://');
+  console.warn('Forced HTTPS for Fly.io backend:', API_BASE_URL);
+}
+
+// Debug logging
+console.log('API Configuration:', {
+  REACT_APP_API_URL: process.env.REACT_APP_API_URL,
+  API_BASE_URL: API_BASE_URL,
+  NODE_ENV: process.env.NODE_ENV
+});
 
 const api = axios.create({
   baseURL: API_BASE_URL,
