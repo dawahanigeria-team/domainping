@@ -173,6 +173,39 @@ async def refresh_whois_data(domain_id: int, db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to refresh WHOIS data: {str(e)}")
 
+@router.post("/check-whois")
+async def check_whois_availability(domain_name: str, db: Session = Depends(get_db)):
+    """Check if WHOIS data can be fetched for a domain"""
+    try:
+        domain_service = DomainService(db)
+        whois_data = await domain_service.whois_service.get_domain_info(domain_name)
+        
+        if whois_data and 'error' not in whois_data:
+            return {
+                "success": True,
+                "message": "WHOIS data available",
+                "data": whois_data
+            }
+        elif whois_data and 'error' in whois_data:
+            return {
+                "success": False,
+                "message": f"WHOIS lookup failed: {whois_data['error']}",
+                "error_type": whois_data.get('error_type', 'unknown'),
+                "manual_entry_required": True
+            }
+        else:
+            return {
+                "success": False,
+                "message": "WHOIS lookup returned no data",
+                "manual_entry_required": True
+            }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"WHOIS check failed: {str(e)}",
+            "manual_entry_required": True
+        }
+
 @router.get("/name/{domain_name}", response_model=DomainResponse)
 async def get_domain_by_name(domain_name: str, db: Session = Depends(get_db)):
     """Get domain by name"""

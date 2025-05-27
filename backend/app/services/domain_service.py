@@ -164,12 +164,18 @@ class DomainService:
                 return None
             
             whois_data = await self.whois_service.get_domain_info(domain.name)
+            
+            # Always update last_checked, even if WHOIS fails
+            updates = {'last_checked': datetime.utcnow()}
+            
             if not whois_data or 'error' in whois_data:
-                logger.warning(f"Failed to fetch WHOIS data for {domain.name}")
-                return domain
+                error_msg = whois_data.get('error', 'Unknown WHOIS error') if whois_data else 'No WHOIS data returned'
+                logger.warning(f"Failed to fetch WHOIS data for {domain.name}: {error_msg}")
+                
+                # Still update the domain to mark it as checked
+                return await self.update_domain(domain_id, **updates)
             
             # Update domain with WHOIS data
-            updates = {}
             if 'expiration_date' in whois_data and whois_data['expiration_date']:
                 updates['expiration_date'] = whois_data['expiration_date']
             if 'registrar' in whois_data and whois_data['registrar']:
@@ -180,12 +186,16 @@ class DomainService:
                 updates['admin_email'] = whois_data['admin_email']
             
             updates['whois_last_updated'] = datetime.utcnow()
-            updates['last_checked'] = datetime.utcnow()
             
             return await self.update_domain(domain_id, **updates)
             
         except Exception as e:
             logger.error(f"Failed to refresh WHOIS data for domain {domain_id}: {str(e)}")
+            # Try to at least update the last_checked timestamp
+            try:
+                await self.update_domain(domain_id, last_checked=datetime.utcnow())
+            except:
+                pass
             raise e
     
     def get_expiring_domains(self, days_ahead: int = 90) -> List[Domain]:

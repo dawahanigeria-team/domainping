@@ -9,6 +9,11 @@ load_dotenv()
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./domains.db")
 
+# Fallback to regular SQLite if SQLite Cloud is not available
+if DATABASE_URL.startswith("sqlitecloud://"):
+    print("Warning: SQLite Cloud URL detected but package not available. Falling back to local SQLite.")
+    DATABASE_URL = "sqlite:///./domains.db"
+
 # SQLAlchemy setup
 # Only use check_same_thread for local SQLite, not SQLite Cloud
 connect_args = {}
