@@ -98,7 +98,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   default_root_object = "index.html"
 
   # Aliases for custom domain (optional)
-  aliases = var.domain_name != "" ? [var.domain_name, "www.${var.domain_name}"] : []
+  aliases = concat(
+    var.domain_name != "" ? [var.domain_name, "www.${var.domain_name}"] : [],
+    var.additional_aliases
+  )
 
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
