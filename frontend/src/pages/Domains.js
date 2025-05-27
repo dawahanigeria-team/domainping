@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   PlusIcon,
@@ -22,11 +22,7 @@ const Domains = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [refreshingId, setRefreshingId] = useState(null);
 
-  useEffect(() => {
-    fetchDomains();
-  }, [searchTerm, statusFilter]);
-
-  const fetchDomains = async () => {
+  const fetchDomains = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -41,7 +37,11 @@ const Domains = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, statusFilter]);
+
+  useEffect(() => {
+    fetchDomains();
+  }, [fetchDomains]);
 
   const handleRefreshWhois = async (domainId) => {
     try {

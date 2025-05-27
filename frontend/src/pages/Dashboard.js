@@ -9,7 +9,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { domainAPI } from '../services/api';
-import { format, formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import toast from 'react-hot-toast';
 
 const Dashboard = () => {

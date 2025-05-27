@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { 
   ArrowLeftIcon,
-  InformationCircleIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { domainAPI } from '../services/api';
