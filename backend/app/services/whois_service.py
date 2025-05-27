@@ -37,19 +37,65 @@ class WhoisService:
             # Perform WHOIS lookup with retries
             for attempt in range(self.retry_count):
                 try:
-                    w = whois.whois(domain_name)
+                    # Add timeout to prevent hanging
+                    import signal
                     
-                    if w:
-                        return self._parse_whois_data(w, domain_name)
+                    def timeout_handler(signum, frame):
+                        raise TimeoutError("WHOIS lookup timed out")
                     
+                    # Set timeout signal (only works on Unix systems)
+                    try:
+                        signal.signal(signal.SIGALRM, timeout_handler)
+                        signal.alarm(self.timeout)
+                        
+                        w = whois.whois(domain_name)
+                        
+                        signal.alarm(0)  # Cancel timeout
+                        
+                        if w:
+                            return self._parse_whois_data(w, domain_name)
+                        else:
+                            logger.warning(f"WHOIS returned empty data for {domain_name}")
+                            
+                    except (AttributeError, OSError):
+                        # signal.alarm not available on Windows or in some containers
+                        logger.info("Using fallback WHOIS method without timeout")
+                        w = whois.whois(domain_name)
+                        
+                        if w:
+                            return self._parse_whois_data(w, domain_name)
+                        else:
+                            logger.warning(f"WHOIS returned empty data for {domain_name}")
+                    
+                except (TimeoutError, ConnectionError, OSError) as e:
+                    logger.warning(f"WHOIS attempt {attempt + 1} failed for {domain_name}: Network error - {str(e)}")
+                    if attempt == self.retry_count - 1:
+                        logger.error(f"All WHOIS attempts failed for {domain_name}. Network connectivity issues.")
+                        return {
+                            'domain_name': domain_name,
+                            'error': 'Network connectivity issues. WHOIS lookup failed.',
+                            'error_type': 'network_error',
+                            'last_updated': datetime.utcnow()
+                        }
                 except Exception as e:
                     logger.warning(f"WHOIS attempt {attempt + 1} failed for {domain_name}: {str(e)}")
                     if attempt == self.retry_count - 1:
-                        raise e
+                        logger.error(f"All WHOIS attempts failed for {domain_name}")
+                        return {
+                            'domain_name': domain_name,
+                            'error': f'WHOIS lookup failed: {str(e)}',
+                            'error_type': 'whois_error',
+                            'last_updated': datetime.utcnow()
+                        }
                     
         except Exception as e:
             logger.error(f"Failed to fetch WHOIS data for {domain_name}: {str(e)}")
-            return None
+            return {
+                'domain_name': domain_name,
+                'error': f'Unexpected error: {str(e)}',
+                'error_type': 'unexpected_error',
+                'last_updated': datetime.utcnow()
+            }
     
     def _parse_whois_data(self, whois_data: Any, domain_name: str) -> Dict[str, Any]:
         """
