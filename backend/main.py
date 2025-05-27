@@ -54,6 +54,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # React development server
         "http://127.0.0.1:3000",
+        "https://domainping-frontend.fly.dev",  # Fly.io frontend
         os.getenv("FRONTEND_URL", "http://localhost:3000")
     ],
     allow_credentials=True,

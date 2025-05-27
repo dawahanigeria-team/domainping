@@ -1,0 +1,31 @@
+# Example Terraform variables for DomainPing Frontend Infrastructure
+# Copy this file to terraform.tfvars and customize the values
+
+# Project configuration
+project_name = "domainping"
+environment  = "prod"
+
+# AWS configuration
+aws_region = "us-east-1"
+
+# Domain configuration (optional)
+# Leave empty to use CloudFront domain only
+domain_name = ""
+# domain_name = "domainping.com"
+
+# CloudFront configuration
+# PriceClass_100: US, Canada, Europe
+# PriceClass_200: US, Canada, Europe, Asia, Middle East, Africa
+# PriceClass_All: All edge locations
+cloudfront_price_class = "PriceClass_100"
+
+# Logging configuration
+enable_logging = false
+
+# Additional tags
+tags = {
+  Owner       = "DomainPing-Team"
+  Project     = "DomainPing"
+  Environment = "Production"
+  CostCenter  = "Engineering"
+} 

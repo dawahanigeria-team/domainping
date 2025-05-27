@@ -20,7 +20,41 @@ After analyzing DomainPing's architecture and requirements, here are the **top 3
 
 ## 🎯 Recommended Architectures
 
-### Option 1: Railway (Full-Stack) - **Easiest**
+### Option 1: Fly.io + AWS S3/CloudFront - **Best Overall** ⭐
+```
+┌─────────────────┐    ┌──────────────────────────────┐
+│   Fly.io        │    │         AWS Cloud            │
+│                 │    │                              │
+│  ┌─────────────┐│    │  ┌─────────┐  ┌─────────────┐│
+│  │ FastAPI     ││    │  │Route 53 │  │ CloudFront  ││
+│  │ Backend     ││◄───┤  │ (DNS)   │◄─┤    (CDN)    ││
+│  └─────────────┘│    │  └─────────┘  └─────────────┘│
+│  ┌─────────────┐│    │                ┌─────────────┐│
+│  │ SQLite +    ││    │                │     S3      ││
+│  │ Volume      ││    │                │ (Frontend)  ││
+│  └─────────────┘│    │                └─────────────┘│
+└─────────────────┘    └──────────────────────────────┘
+```
+**Cost**: ~$2-7/month | **Setup**: 30 minutes | **Enterprise-grade performance**
+
+### Option 2: Fly.io Full-Stack - **Best for Team Repos**
+```
+┌─────────────────────────────────────┐
+│              Fly.io                 │
+│                                     │
+│  ┌─────────────┐  ┌─────────────┐   │
+│  │ Frontend    │  │ Backend     │   │
+│  │ React App   │◄─┤ FastAPI     │   │
+│  │ (Nginx)     │  │ API         │   │
+│  └─────────────┘  └─────────────┘   │
+│                   │ SQLite +    │   │
+│                   │ Volume      │   │
+│                   └─────────────┘   │
+└─────────────────────────────────────┘
+```
+**Cost**: ~$4-8/month | **Setup**: 25 minutes | **No GitHub restrictions**
+
+### Option 3: Railway (Full-Stack) - **Easiest**
 ```
 ┌─────────────────┐    ┌──────────────────┐
 │   Railway       │    │    Vercel        │
@@ -37,7 +71,7 @@ After analyzing DomainPing's architecture and requirements, here are the **top 3
 ```
 **Cost**: ~$15-25/month | **Setup**: 15 minutes
 
-### Option 2: Fly.io + Vercel - **Most Cost-Effective**
+### Option 3: Fly.io + Vercel - **Most Cost-Effective**
 ```
 ┌─────────────────┐    ┌──────────────────┐
 │   Fly.io        │    │    Vercel        │
@@ -52,50 +86,48 @@ After analyzing DomainPing's architecture and requirements, here are the **top 3
 │  └─────────────┘│
 └─────────────────┘
 ```
-**Cost**: ~$5-10/month | **Setup**: 20 minutes
+**Cost**: ~$2-5/month | **Setup**: 20 minutes | **Requires personal GitHub**
 
-### Option 3: Railway (Backend) + Vercel (Frontend) - **Best Performance**
-```
-┌─────────────────┐    ┌──────────────────┐
-│   Railway       │    │    Vercel        │
-│                 │    │                  │
-│  ┌─────────────┐│    │  ┌─────────────┐ │
-│  │ FastAPI     ││    │  │ React App   │ │
-│  │ Backend     ││◄───┤  │ Frontend    │ │
-│  └─────────────┘│    │  └─────────────┘ │
-│  ┌─────────────┐│    └──────────────────┘
-│  │ PostgreSQL  ││
-│  │ Database    ││
-│  └─────────────┘│
-└─────────────────┘
-```
-**Cost**: ~$10-20/month | **Setup**: 25 minutes
+## 🏆 My Recommendation: **Fly.io + AWS S3/CloudFront** ⭐
 
-## 🏆 My Recommendation: **Fly.io + Vercel**
+For DomainPing, I recommend **Fly.io for backend** and **AWS S3 + CloudFront for frontend**:
 
-For DomainPing, I recommend **Fly.io for the backend** and **Vercel for the frontend**:
+### Why This Hybrid Approach?
+- ✅ **Best of both worlds**: Fly.io's excellent backend + AWS's enterprise frontend
+- ✅ **Most cost-effective** (~$2-7/month total)
+- ✅ **No GitHub team restrictions** (AWS works with any repo)
+- ✅ **Enterprise-grade CDN**: CloudFront's global performance
+- ✅ **AWS Free Tier**: 12 months of mostly free hosting
+- ✅ **Scalability**: Handles any traffic load automatically
+- ✅ **Professional setup**: What enterprises actually use
 
 ### Why Fly.io for Backend?
-- ✅ **Most cost-effective** (~$2-5/month)
 - ✅ **Excellent FastAPI support**
 - ✅ **SQLite with persistent volumes**
-- ✅ **Global edge deployment**
 - ✅ **Auto-sleep saves money**
-- ✅ **Built-in SSL and monitoring**
+- ✅ **Simple deployment**
 
-### Why Vercel for Frontend?
-- ✅ **Free tier is generous**
-- ✅ **Automatic deployments from Git**
-- ✅ **Global CDN performance**
-- ✅ **Perfect for React apps**
-- ✅ **Zero configuration needed**
+### Why AWS S3 + CloudFront for Frontend?
+- ✅ **Global CDN performance**: Faster than any single-server solution
+- ✅ **AWS Free Tier**: Mostly free for 12 months
+- ✅ **Enterprise reliability**: 99.99% uptime SLA
+- ✅ **Automatic scaling**: Handles viral traffic spikes
+- ✅ **Professional domains**: Easy custom domain setup
 
 ## 💰 Cost Breakdown
 
-### Fly.io + Vercel (Recommended)
+### Fly.io + AWS S3/CloudFront (Recommended)
 - **Fly.io Backend**: $2-5/month (shared-cpu-1x, 256MB)
-- **Vercel Frontend**: Free (up to 100GB bandwidth)
-- **Total**: **$2-5/month**
+- **AWS S3**: Free for 12 months, then ~$0.10-1/month
+- **AWS CloudFront**: Free for 12 months, then ~$1-5/month
+- **AWS Route 53**: $0.50/month (if using custom domain)
+- **Total**: **$2-7/month** (mostly free first year)
+
+### Fly.io Full-Stack
+- **Fly.io Backend**: $2-5/month (shared-cpu-1x, 256MB)
+- **Fly.io Frontend**: $2-3/month (shared-cpu-1x, 256MB)
+- **Volume**: $0.15/month (1GB)
+- **Total**: **$4-8/month**
 
 ### Railway Full-Stack
 - **Railway Backend**: $5-10/month

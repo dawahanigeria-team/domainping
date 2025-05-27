@@ -110,6 +110,35 @@ DEFAULT_REMINDER_DAYS=90,30,14,7,3,1
 3. **Monitor**: DomainPing runs automatically in the background
 4. **Renew**: Get timely reminders and never miss a renewal
 
+## 🚀 Deployment
+
+### Cloud Hosting Options
+
+1. **AWS S3 + CloudFront** (Recommended - Enterprise-grade)
+2. **Fly.io** (Cost-effective - Backend)
+3. **Railway** (Easiest - Full Stack)
+4. **Vercel** (Frontend only)
+
+### Infrastructure as Code (IaC)
+
+Deploy AWS infrastructure automatically with Terraform:
+
+```bash
+# One-command deployment
+./iac/deploy.sh deploy
+```
+
+This creates:
+- S3 bucket for frontend hosting
+- CloudFront distribution for global CDN
+- IAM user for GitHub Actions
+- Optional custom domain setup
+
+### Manual Deployment
+
+📖 **Detailed deployment guides**: [deploy/](deploy/)
+🏗️ **Infrastructure setup**: [iac/](iac/)
+
 ## Architecture
 
 ```
@@ -126,6 +155,10 @@ DEFAULT_REMINDER_DAYS=90,30,14,7,3,1
 │   │   ├── pages/
 │   │   └── services/
 │   └── package.json
+├── iac/              # Infrastructure as Code
+│   ├── terraform/    # Terraform configurations
+│   └── deploy.sh     # Automated deployment
+├── deploy/           # Deployment guides
 └── docs/             # Documentation
 ```
 
