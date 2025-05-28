@@ -30,7 +30,7 @@ jobs:
       - name: Build React app
         working-directory: frontend
         env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://domainping.fly.dev/api' }}
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://domainping-production.up.railway.app/api' }}
           GENERATE_SOURCEMAP: false
         run: npm run build
 
