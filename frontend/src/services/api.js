@@ -26,28 +26,28 @@ const api = axios.create({
 // Domain API
 export const domainAPI = {
   // Get all domains
-  getDomains: (params = {}) => api.get('/domains', { params }),
+  getDomains: (params = {}) => api.get('/domains/', { params }),
   
   // Get domain by ID
-  getDomain: (id) => api.get(`/domains/${id}`),
+  getDomain: (id) => api.get(`/domains/${id}/`),
   
   // Create new domain
-  createDomain: (data) => api.post('/domains', data),
+  createDomain: (data) => api.post('/domains/', data),
   
   // Update domain
-  updateDomain: (id, data) => api.put(`/domains/${id}`, data),
+  updateDomain: (id, data) => api.put(`/domains/${id}/`, data),
   
   // Delete domain
-  deleteDomain: (id) => api.delete(`/domains/${id}`),
+  deleteDomain: (id) => api.delete(`/domains/${id}/`),
   
   // Refresh WHOIS data
-  refreshWhois: (id) => api.post(`/domains/${id}/refresh-whois`),
+  refreshWhois: (id) => api.post(`/domains/${id}/refresh-whois/`),
   
   // Get domain statistics
-  getStatistics: () => api.get('/domains/statistics'),
+  getStatistics: () => api.get('/domains/statistics/'),
   
   // Get expiring domains
-  getExpiringDomains: (daysAhead = 90) => api.get('/domains/expiring', { 
+  getExpiringDomains: (daysAhead = 90) => api.get('/domains/expiring/', { 
     params: { days_ahead: daysAhead } 
   }),
 };
@@ -55,13 +55,13 @@ export const domainAPI = {
 // Notification API
 export const notificationAPI = {
   // Test email configuration
-  testEmail: (email) => api.post('/notifications/test-email', { email }),
+  testEmail: (email) => api.post('/notifications/test-email/', { email }),
   
   // Test SMS configuration
-  testSMS: (phone) => api.post('/notifications/test-sms', { phone }),
+  testSMS: (phone) => api.post('/notifications/test-sms/', { phone }),
   
   // Test desktop notification
-  testDesktop: () => api.post('/notifications/test-desktop'),
+  testDesktop: () => api.post('/notifications/test-desktop/'),
 };
 
 export default api; 
