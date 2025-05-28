@@ -12,6 +12,9 @@ RUN npm ci --only=production
 # Copy source code
 COPY . .
 
+# Copy production environment file
+COPY env.production .env.production
+
 # Build the React app
 RUN npm run build
 
