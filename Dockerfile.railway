@@ -1,0 +1,45 @@
+# Use Python 3.9 slim image
+FROM python:3.9-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    curl \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY backend/requirements.txt .
+
+# Install Python dependencies with verbose output
+RUN pip install --no-cache-dir --verbose -r requirements.txt
+
+# Verify SQLite Cloud installation
+RUN python -c "import sqlalchemy_sqlitecloud; print('✅ SQLite Cloud package installed successfully')" || \
+    (echo "❌ SQLite Cloud package not found, installing manually..." && \
+     pip install sqlalchemy-sqlitecloud==0.1.2 && \
+     python -c "import sqlalchemy_sqlitecloud; print('✅ SQLite Cloud package installed manually')")
+
+# Copy backend code
+COPY backend/ .
+
+# Create data directory for local SQLite fallback
+RUN mkdir -p /app/data
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash app && \
+    chown -R app:app /app
+USER app
+
+# Expose port (Railway uses PORT environment variable)
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+# Start the application (Railway provides PORT env var)
+CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} 
